@@ -3,6 +3,12 @@ import { ChangeEvent, Dispatch, SetStateAction, useState } from "react";
 
 const minMagnitudeRange = 0.1;
 
+type SearchFormProps = {
+  searchRadius: number;
+  setSearchRadius: Dispatch<SetStateAction<number>>;
+  pinPosition: google.maps.LatLngLiteral | null;
+};
+
 // Handles timezone offset from UTC. Returns yyyy-mm-dd
 const getClientDateISOString = () => {
   const today = new Date();
@@ -11,14 +17,17 @@ const getClientDateISOString = () => {
     .substring(0, 10);
 };
 
-const SearchForm = () => {
+const SearchForm = ({
+  searchRadius,
+  setSearchRadius,
+  pinPosition,
+}: SearchFormProps) => {
   // Dates in yyyy/mm/dd format
   const [startDate, setStartDate] = useState<string>("1900-01-01");
   const [endDate, setEndDate] = useState<string>(getClientDateISOString());
   const [magnitudeValues, setMagnitudeValues] = useState<[number, number]>([
     8, 10,
   ]);
-  const [searchRadius, setSearchRadius] = useState<number>(10000);
   const [results, setResults] = useState<number>(100);
 
   const handleDateChange = (
