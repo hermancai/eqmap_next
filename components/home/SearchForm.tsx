@@ -69,6 +69,7 @@ const SearchForm = () => {
   return (
     <div className="md:w-[24rem] md:h-screen flex flex-col items-center p-8 bg-slate-100 gap-8 overflow-auto">
       <h1 className="text-4xl text-center tracking-wide">EARTHQUAKE MAP</h1>
+      <p>Choose a location by clicking on the map.</p>
       <div className="w-full flex justify-between items-center gap-3">
         <label htmlFor="startDate">Start</label>
         <span className="relative h-full grow border-t-[1px] border-slate-300 top-1/2" />
