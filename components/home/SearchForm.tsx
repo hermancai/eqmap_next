@@ -1,4 +1,3 @@
-import Slider from "@mui/material/Slider";
 import {
   ChangeEvent,
   Dispatch,
@@ -6,6 +5,9 @@ import {
   useEffect,
   useState,
 } from "react";
+import Slider from "@mui/material/Slider";
+import { fetchData } from "@/services/USGS";
+import { USGSData } from "@/types/USGS";
 
 const minMagnitudeRange = 0.1;
 
@@ -13,6 +15,7 @@ type SearchFormProps = {
   searchRadius: number;
   setSearchRadius: Dispatch<SetStateAction<number>>;
   pinPosition: google.maps.LatLngLiteral | null;
+  setData: Dispatch<SetStateAction<USGSData | null>>;
 };
 
 // Handles timezone offset from UTC. Returns yyyy-mm-dd
@@ -27,6 +30,7 @@ const SearchForm = ({
   searchRadius,
   setSearchRadius,
   pinPosition,
+  setData,
 }: SearchFormProps) => {
   // Dates in yyyy/mm/dd format
   const [startDate, setStartDate] = useState<string>("1900-01-01");
@@ -83,16 +87,31 @@ const SearchForm = ({
     setResults(newValue as number);
   };
 
-  const handleSearch = () => {
+  const handleSearch = async () => {
     if (!validDates || pinPosition === null) {
       return;
     }
-    console.log(pinPosition.lat, pinPosition.lng);
-    console.log(startDate);
-    console.log(endDate);
-    console.log(magnitudeValues);
-    console.log(searchRadius);
-    console.log(results);
+
+    setLoading(true);
+    setData(null);
+
+    try {
+      const data = await fetchData({
+        lat: pinPosition.lat,
+        lng: pinPosition.lng,
+        startDate,
+        endDate,
+        minMag: magnitudeValues[0],
+        maxMag: magnitudeValues[1],
+        searchRadius,
+        resultLimit: results,
+      });
+      setData(data);
+    } catch {
+      alert("An error occurred while communicating with USGS.");
+    }
+
+    setLoading(false);
   };
 
   // Date validation
@@ -107,7 +126,7 @@ const SearchForm = ({
     }
 
     const today = new Date(getClientTodayISOString());
-    if (start > today) {
+    if (start >= today) {
       return setValidDates(false); // Start greater than today
     }
 
@@ -202,11 +221,15 @@ const SearchForm = ({
         />
       </div>
       <button
-        className="text-white bg-slate-800 py-2 px-4 rounded disabled:bg-slate-500"
+        className="w-24 h-10 text-white bg-slate-800 py-2 px-4 rounded disabled:bg-slate-500 flex justify-center items-center"
         onClick={handleSearch}
         disabled={!validDates || loading}
       >
-        SEARCH
+        {loading ? (
+          <div className="h-6 w-6 border-4 border-t-4 border-slate-500 border-t-slate-800 border-b-slate-800 animate-spin rounded-full" />
+        ) : (
+          "SEARCH"
+        )}
       </button>
     </div>
   );

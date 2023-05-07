@@ -11,6 +11,7 @@ import {
   Marker,
   Circle,
 } from "@react-google-maps/api";
+import { USGSData } from "@/types/USGS";
 
 type PinState = google.maps.Marker | null;
 type CircleState = google.maps.Circle | null;
@@ -19,6 +20,7 @@ type MapProps = {
   pinPosition: google.maps.LatLngLiteral | null;
   setPinPosition: Dispatch<SetStateAction<google.maps.LatLngLiteral | null>>;
   searchRadius: number;
+  data: USGSData | null;
 };
 
 const API_KEY = process.env.NEXT_PUBLIC_MAP_API_KEY;
@@ -34,7 +36,7 @@ const defaultCenter = {
 } as google.maps.LatLngLiteral;
 
 // NOTE: Two circles are rendered in strict mode.
-const Map = ({ pinPosition, setPinPosition, searchRadius }: MapProps) => {
+const Map = ({ pinPosition, setPinPosition, searchRadius, data }: MapProps) => {
   const { isLoaded } = useJsApiLoader({
     id: "google-map-script",
     googleMapsApiKey: API_KEY!,
@@ -93,6 +95,11 @@ const Map = ({ pinPosition, setPinPosition, searchRadius }: MapProps) => {
               onLoad={(c) => setCircle(c)}
             />
           </Marker>
+          {data !== null ? (
+            <div className="absolute bottom-2 left-1/2 -translate-x-1/2 bg-white border-2 border-slate-800 rounded px-4 py-2">
+              {data.features.length} Earthquakes Found
+            </div>
+          ) : null}
         </>
       ) : null}
     </GoogleMap>
