@@ -9,18 +9,20 @@ type QueryValues = {
   resultLimit: number;
 };
 
-type USGSData = {
-  bbox: number[];
-  features: {
-    geometry: { coordinates: number[] };
-    properties: {
-      mag: number;
-      place: string;
-      time: number;
-      title: string;
-    };
-    id: string;
-  }[];
+type EarthquakeData = {
+  geometry: { coordinates: number[] };
+  properties: {
+    mag: number;
+    place: string;
+    time: number;
+    title: string;
+  };
+  id: string;
 };
 
-export type { QueryValues, USGSData };
+type USGSData = {
+  bbox: number[];
+  features: EarthquakeData[];
+};
+
+export type { QueryValues, EarthquakeData, USGSData };

@@ -36,7 +36,7 @@ const SearchForm = ({
   const [startDate, setStartDate] = useState<string>("1900-01-01");
   const [endDate, setEndDate] = useState<string>(getClientTodayISOString());
   const [magnitudeValues, setMagnitudeValues] = useState<[number, number]>([
-    8, 10,
+    7.5, 10,
   ]);
   const [results, setResults] = useState<number>(100);
   const [validDates, setValidDates] = useState<boolean>(true);

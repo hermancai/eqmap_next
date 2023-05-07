@@ -12,6 +12,7 @@ import {
   Circle,
 } from "@react-google-maps/api";
 import { USGSData } from "@/types/USGS";
+import EventCircle from "./EventCircle";
 
 type PinState = google.maps.Marker | null;
 type CircleState = google.maps.Circle | null;
@@ -67,6 +68,24 @@ const Map = ({ pinPosition, setPinPosition, searchRadius, data }: MapProps) => {
     }
   }, [circle, pin]);
 
+  // Pan map to fit all data points
+  useEffect(() => {
+    if (map === null || data === null) return;
+    if (data.features.length === 0) return;
+
+    const bounds = new google.maps.LatLngBounds({
+      lat: data.features[0].geometry.coordinates[1],
+      lng: data.features[0].geometry.coordinates[0],
+    });
+    data.features.forEach((entry) => {
+      bounds.extend({
+        lat: entry.geometry.coordinates[1],
+        lng: entry.geometry.coordinates[0],
+      });
+    });
+    map.fitBounds(bounds);
+  }, [map, data]);
+
   return isLoaded ? (
     <GoogleMap
       mapContainerStyle={containerStyle}
@@ -95,10 +114,15 @@ const Map = ({ pinPosition, setPinPosition, searchRadius, data }: MapProps) => {
               onLoad={(c) => setCircle(c)}
             />
           </Marker>
-          {data !== null ? (
-            <div className="absolute bottom-2 left-1/2 -translate-x-1/2 bg-white border-2 border-slate-800 rounded px-4 py-2">
-              {data.features.length} Earthquakes Found
-            </div>
+          {data !== null && map !== null ? (
+            <>
+              <div className="absolute bottom-2 left-1/2 -translate-x-1/2 bg-white border-2 border-slate-800 rounded px-4 py-2">
+                {data.features.length} Earthquakes Found
+              </div>
+              {data.features.map((entry) => {
+                return <EventCircle map={map} data={entry} key={entry.id} />;
+              })}
+            </>
           ) : null}
         </>
       ) : null}
