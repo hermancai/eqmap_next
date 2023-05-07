@@ -1,5 +1,11 @@
 import Slider from "@mui/material/Slider";
-import { ChangeEvent, Dispatch, SetStateAction, useState } from "react";
+import {
+  ChangeEvent,
+  Dispatch,
+  SetStateAction,
+  useEffect,
+  useState,
+} from "react";
 
 const minMagnitudeRange = 0.1;
 
@@ -10,7 +16,7 @@ type SearchFormProps = {
 };
 
 // Handles timezone offset from UTC. Returns yyyy-mm-dd
-const getClientDateISOString = () => {
+const getClientTodayISOString = () => {
   const today = new Date();
   return new Date(today.getTime() - today.getTimezoneOffset() * 60000)
     .toISOString()
@@ -24,11 +30,13 @@ const SearchForm = ({
 }: SearchFormProps) => {
   // Dates in yyyy/mm/dd format
   const [startDate, setStartDate] = useState<string>("1900-01-01");
-  const [endDate, setEndDate] = useState<string>(getClientDateISOString());
+  const [endDate, setEndDate] = useState<string>(getClientTodayISOString());
   const [magnitudeValues, setMagnitudeValues] = useState<[number, number]>([
     8, 10,
   ]);
   const [results, setResults] = useState<number>(100);
+  const [validDates, setValidDates] = useState<boolean>(true);
+  const [loading, setLoading] = useState<boolean>(false);
 
   const handleDateChange = (
     e: ChangeEvent<HTMLInputElement>,
@@ -75,6 +83,41 @@ const SearchForm = ({
     setResults(newValue as number);
   };
 
+  const handleSearch = () => {
+    if (!validDates || pinPosition === null) {
+      return;
+    }
+    console.log(pinPosition.lat, pinPosition.lng);
+    console.log(startDate);
+    console.log(endDate);
+    console.log(magnitudeValues);
+    console.log(searchRadius);
+    console.log(results);
+  };
+
+  // Date validation
+  useEffect(() => {
+    if (!startDate || !endDate) {
+      return setValidDates(false); // Missing dates
+    }
+
+    const start = new Date(startDate);
+    if (start > new Date(endDate)) {
+      return setValidDates(false); // Start greater than end
+    }
+
+    const today = new Date(getClientTodayISOString());
+    if (start > today) {
+      return setValidDates(false); // Start greater than today
+    }
+
+    if (startDate === endDate) {
+      return setValidDates(false); // Equal dates
+    }
+
+    setValidDates(true);
+  }, [startDate, endDate]);
+
   return (
     <div className="md:w-[24rem] md:h-screen flex flex-col items-center p-8 bg-slate-100 gap-8 overflow-auto">
       <h1 className="text-4xl text-center tracking-wide">EARTHQUAKE MAP</h1>
@@ -87,7 +130,9 @@ const SearchForm = ({
           id="startDate"
           value={startDate}
           onChange={(e) => handleDateChange(e, setStartDate)}
-          className="p-1 rounded border border-slate-300 focus:outline-slate-900 outline-none outline-offset-0 w-[10rem] hover:cursor-pointer"
+          className={`p-1 rounded border border-slate-300 ${
+            validDates ? "focus:outline-slate-900" : "outline-red-500"
+          }  outline-none outline-offset-0 w-[10rem] hover:cursor-pointer`}
         />
       </div>
       <div className="w-full flex justify-between items-center gap-3">
@@ -98,7 +143,9 @@ const SearchForm = ({
           id="endDate"
           value={endDate}
           onChange={(e) => handleDateChange(e, setEndDate)}
-          className="p-1 rounded border border-slate-300 focus:outline-slate-900 outline-none outline-offset-0 w-[10rem] hover:cursor-pointer"
+          className={`p-1 rounded border border-slate-300 ${
+            validDates ? "focus:outline-slate-900" : "outline-red-500"
+          }  outline-none outline-offset-0 w-[10rem] hover:cursor-pointer`}
         />
       </div>
       <div className="w-full flex flex-col">
@@ -111,7 +158,6 @@ const SearchForm = ({
         <Slider
           value={magnitudeValues}
           onChange={handleMagnitudeChange}
-          disableSwap
           min={0}
           max={10}
           step={0.1}
@@ -132,7 +178,6 @@ const SearchForm = ({
           min={100}
           max={20000}
           step={100}
-          disableSwap
           sx={{
             color: "#1e293b",
             height: "7px",
@@ -150,14 +195,17 @@ const SearchForm = ({
           min={10}
           max={1000}
           step={10}
-          disableSwap
           sx={{
             color: "#1e293b",
             height: "7px",
           }}
         />
       </div>
-      <button className="text-white bg-slate-800 py-2 px-4 rounded hover:scale-105">
+      <button
+        className="text-white bg-slate-800 py-2 px-4 rounded disabled:bg-slate-500"
+        onClick={handleSearch}
+        disabled={!validDates || loading}
+      >
         SEARCH
       </button>
     </div>
