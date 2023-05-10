@@ -8,13 +8,16 @@ import {
 import Slider from "@mui/material/Slider";
 import { fetchData } from "@/services/USGS";
 import { USGSData } from "@/types/USGS";
+import { motion, AnimatePresence } from "framer-motion";
 
 const minMagnitudeRange = 0.1;
 
 type SearchFormProps = {
   searchRadius: number;
   setSearchRadius: Dispatch<SetStateAction<number>>;
+  setSearchedCenter: Dispatch<SetStateAction<google.maps.LatLngLiteral | null>>;
   pinPosition: google.maps.LatLngLiteral | null;
+  data: USGSData | null;
   setData: Dispatch<SetStateAction<USGSData | null>>;
 };
 
@@ -29,7 +32,9 @@ const getClientTodayISOString = () => {
 const SearchForm = ({
   searchRadius,
   setSearchRadius,
+  setSearchedCenter,
   pinPosition,
+  data,
   setData,
 }: SearchFormProps) => {
   // Dates in yyyy/mm/dd format
@@ -41,6 +46,7 @@ const SearchForm = ({
   const [results, setResults] = useState<number>(100);
   const [validDates, setValidDates] = useState<boolean>(true);
   const [loading, setLoading] = useState<boolean>(false);
+  const [longLoad, setLongLoad] = useState<boolean>(false);
 
   const handleDateChange = (
     e: ChangeEvent<HTMLInputElement>,
@@ -94,6 +100,9 @@ const SearchForm = ({
 
     setLoading(true);
     setData(null);
+    const timeoutId = setTimeout(() => {
+      setLongLoad(true);
+    }, 3000);
 
     try {
       const data = await fetchData({
@@ -106,12 +115,20 @@ const SearchForm = ({
         searchRadius,
         resultLimit: results,
       });
-      setData(data);
+      setSearchedCenter(pinPosition);
+      clearTimeout(timeoutId);
+      setLongLoad(false);
+      // Wait for long load message exit transition
+      setTimeout(() => {
+        setData(data);
+      }, 300);
     } catch {
       alert("An error occurred while communicating with USGS.");
+      clearTimeout(timeoutId);
+      setLongLoad(false);
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
   };
 
   // Date validation
@@ -140,7 +157,7 @@ const SearchForm = ({
   return (
     <div className="md:w-[24rem] md:h-screen flex flex-col items-center p-8 bg-slate-100 gap-8 overflow-auto">
       <h1 className="text-4xl text-center tracking-wide">EARTHQUAKE MAP</h1>
-      <p>Choose a location by clicking on the map.</p>
+      <p className="text-center">Choose a location by clicking on the map.</p>
       <div className="w-full flex justify-between items-center gap-3">
         <label htmlFor="startDate">Start</label>
         <span className="relative h-full grow border-t-[1px] border-slate-300 top-1/2" />
@@ -221,7 +238,7 @@ const SearchForm = ({
         />
       </div>
       <button
-        className="w-24 h-10 text-white bg-slate-800 py-2 px-4 rounded disabled:bg-slate-500 flex justify-center items-center"
+        className="w-24 h-10 text-white bg-slate-800 py-2 px-4 rounded disabled:bg-slate-500 flex justify-center items-center hover:text-orange-400 transition-colors duration-200"
         onClick={handleSearch}
         disabled={!validDates || loading}
       >
@@ -231,6 +248,43 @@ const SearchForm = ({
           "SEARCH"
         )}
       </button>
+      <div className="w-full">
+        <AnimatePresence>
+          {longLoad && (
+            <motion.div
+              className="text-center w-full p-2 border-4 border-yellow-300 rounded"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              <p>Gathering data...</p>
+              <p className="text-sm text-gray-500">
+                This may take some time depending on your search terms.
+              </p>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        <AnimatePresence>
+          {data !== null && (
+            <motion.div
+              className="text-center w-full p-2 border-4 border-green-500 rounded"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              <p className="text-lg">{`${data.features.length} Earthquake${
+                data.features.length === 1 ? "" : "s"
+              } Found`}</p>
+              {data.features.length > 1 ? (
+                <p className="text-sm text-gray-500">Scroll for more data</p>
+              ) : null}
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
     </div>
   );
 };

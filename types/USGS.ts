@@ -20,8 +20,9 @@ type EarthquakeData = {
   id: string;
 };
 
+// bbox only if at least 2 features. Holds confining coordinates for all points
 type USGSData = {
-  bbox: number[];
+  bbox?: [number, number, number, number, number, number];
   features: EarthquakeData[];
 };
 

@@ -20,6 +20,7 @@ type MapState = google.maps.Map | null;
 type MapProps = {
   pinPosition: google.maps.LatLngLiteral | null;
   setPinPosition: Dispatch<SetStateAction<google.maps.LatLngLiteral | null>>;
+  searchedCenter: google.maps.LatLngLiteral | null;
   searchRadius: number;
   data: USGSData | null;
 };
@@ -37,7 +38,13 @@ const defaultCenter = {
 } as google.maps.LatLngLiteral;
 
 // NOTE: Two circles are rendered in strict mode.
-const Map = ({ pinPosition, setPinPosition, searchRadius, data }: MapProps) => {
+const Map = ({
+  pinPosition,
+  setPinPosition,
+  searchedCenter,
+  searchRadius,
+  data,
+}: MapProps) => {
   const { isLoaded } = useJsApiLoader({
     id: "google-map-script",
     googleMapsApiKey: API_KEY!,
@@ -46,6 +53,7 @@ const Map = ({ pinPosition, setPinPosition, searchRadius, data }: MapProps) => {
   const [map, setMap] = useState<MapState>(null);
   const [pin, setPin] = useState<PinState>(null);
   const [circle, setCircle] = useState<CircleState>(null);
+  const [showPin, setShowPin] = useState<boolean>(true);
 
   const onMapLoad = useCallback(
     (map: MapState) => {
@@ -57,7 +65,7 @@ const Map = ({ pinPosition, setPinPosition, searchRadius, data }: MapProps) => {
   );
 
   const updatePinPosition = (e: google.maps.MapMouseEvent) => {
-    if (e.latLng === null) return;
+    if (e.latLng === null || !showPin) return;
     setPinPosition({ lat: e.latLng.lat(), lng: e.latLng.lng() });
   };
 
@@ -70,13 +78,10 @@ const Map = ({ pinPosition, setPinPosition, searchRadius, data }: MapProps) => {
 
   // Pan map to fit all data points
   useEffect(() => {
-    if (map === null || data === null) return;
+    if (map === null || data === null || searchedCenter === null) return;
     if (data.features.length === 0) return;
 
-    const bounds = new google.maps.LatLngBounds({
-      lat: data.features[0].geometry.coordinates[1],
-      lng: data.features[0].geometry.coordinates[0],
-    });
+    const bounds = new google.maps.LatLngBounds(searchedCenter);
     data.features.forEach((entry) => {
       bounds.extend({
         lat: entry.geometry.coordinates[1],
@@ -84,7 +89,7 @@ const Map = ({ pinPosition, setPinPosition, searchRadius, data }: MapProps) => {
       });
     });
     map.fitBounds(bounds);
-  }, [map, data]);
+  }, [map, data, searchedCenter]);
 
   return isLoaded ? (
     <GoogleMap
@@ -98,9 +103,11 @@ const Map = ({ pinPosition, setPinPosition, searchRadius, data }: MapProps) => {
         <>
           <Marker
             position={pinPosition}
-            draggable
+            draggable={showPin}
             onMouseUp={updatePinPosition}
             onLoad={(p) => setPin(p)}
+            opacity={showPin ? 1 : 0}
+            clickable={showPin}
           >
             <Circle
               center={pinPosition}
@@ -112,18 +119,20 @@ const Map = ({ pinPosition, setPinPosition, searchRadius, data }: MapProps) => {
                 strokeOpacity: 0.5,
               }}
               onLoad={(c) => setCircle(c)}
+              visible={showPin}
             />
           </Marker>
-          {data !== null && map !== null ? (
-            <>
-              <div className="absolute bottom-2 left-1/2 -translate-x-1/2 bg-white border-2 border-slate-800 rounded px-4 py-2">
-                {data.features.length} Earthquakes Found
-              </div>
-              {data.features.map((entry) => {
+          {data !== null && map !== null
+            ? data.features.map((entry) => {
                 return <EventCircle map={map} data={entry} key={entry.id} />;
-              })}
-            </>
-          ) : null}
+              })
+            : null}
+          <div
+            className="text-sm absolute bottom-4 left-1/2 -translate-x-1/2 bg-slate-800 text-white rounded px-2 py-1 whitespace-nowrap hover:cursor-pointer hover:text-orange-500 transition-colors duration-200"
+            onClick={() => setShowPin(!showPin)}
+          >
+            {showPin ? "Hide" : "Show"} Pin
+          </div>
         </>
       ) : null}
     </GoogleMap>
