@@ -166,9 +166,9 @@ const SearchForm = ({
           id="startDate"
           value={startDate}
           onChange={(e) => handleDateChange(e, setStartDate)}
-          className={`p-1 rounded border border-slate-300 ${
-            validDates ? "focus:outline-slate-900" : "outline-red-500"
-          }  outline-none outline-offset-0 w-[10rem] hover:cursor-pointer`}
+          className={`p-1 rounded border-2 border-gray-400 ${
+            validDates ? "focus:border-slate-800" : "border-red-500"
+          }  outline-none outline-offset-0 w-[10rem] hover:cursor-pointer hover:border-slate-800 transition-colors duration-200`}
         />
       </div>
       <div className="w-full flex justify-between items-center gap-3">
@@ -179,9 +179,9 @@ const SearchForm = ({
           id="endDate"
           value={endDate}
           onChange={(e) => handleDateChange(e, setEndDate)}
-          className={`p-1 rounded border border-slate-300 ${
-            validDates ? "focus:outline-slate-900" : "outline-red-500"
-          }  outline-none outline-offset-0 w-[10rem] hover:cursor-pointer`}
+          className={`p-1 rounded border-2 border-gray-400 ${
+            validDates ? "focus:border-slate-800" : "border-red-500"
+          } outline-none outline-offset-0 w-[10rem] hover:cursor-pointer hover:border-slate-800 transition-colors duration-200`}
         />
       </div>
       <div className="w-full flex flex-col">
@@ -238,7 +238,7 @@ const SearchForm = ({
         />
       </div>
       <button
-        className="w-24 h-10 text-white bg-slate-800 py-2 px-4 rounded disabled:bg-slate-500 flex justify-center items-center hover:text-orange-400 transition-colors duration-200"
+        className="shadow-sm shadow-gray-500 w-24 h-10 text-white bg-slate-800 py-2 px-4 rounded disabled:bg-slate-500 flex justify-center items-center hover:text-orange-400 transition-colors duration-200"
         onClick={handleSearch}
         disabled={!validDates || loading}
       >

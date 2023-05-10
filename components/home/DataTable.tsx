@@ -115,7 +115,7 @@ const DataTable = ({ entries }: DataTableProps) => {
     <div className="bg-slate-100 overflow-x-auto text-sm sm:text-base py-10">
       <table
         {...getTableProps()}
-        className="border-separate border-spacing-0 m-auto w-full md:w-[768px] table-fixed overflow-hidden md:rounded"
+        className="border-separate border-spacing-0 border border-slate-800 m-auto w-full md:w-[768px] table-fixed overflow-hidden md:rounded md:shadow-sm md:shadow-gray-500"
       >
         <caption className="md:text-left pb-2 md:px-4">
           Click on a row to highlight the event on the map.

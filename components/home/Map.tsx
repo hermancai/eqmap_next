@@ -128,7 +128,7 @@ const Map = ({
               })
             : null}
           <div
-            className="text-sm absolute bottom-4 left-1/2 -translate-x-1/2 bg-slate-800 text-white rounded px-2 py-1 whitespace-nowrap hover:cursor-pointer hover:text-orange-500 transition-colors duration-200"
+            className="shadow-sm shadow-black text-sm absolute bottom-4 left-1/2 -translate-x-1/2 bg-slate-800 text-white rounded px-2 py-1 whitespace-nowrap hover:cursor-pointer hover:text-orange-500 transition-colors duration-200"
             onClick={() => setShowPin(!showPin)}
           >
             {showPin ? "Hide" : "Show"} Pin
