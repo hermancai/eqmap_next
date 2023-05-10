@@ -9,9 +9,12 @@ import {
   ChevronLeftIcon,
   ChevronRightIcon,
 } from "@heroicons/react/24/outline";
+import { SelectedRows } from "@/pages";
 
 type DataTableProps = {
   entries: EarthquakeData[];
+  selectedRows: SelectedRows;
+  toggleSelectedRow: (id: EarthquakeData["id"]) => void;
 };
 
 type PaginationButtonProps = {
@@ -38,7 +41,11 @@ const PaginationButton = ({
   );
 };
 
-const DataTable = ({ entries }: DataTableProps) => {
+const DataTable = ({
+  entries,
+  selectedRows,
+  toggleSelectedRow,
+}: DataTableProps) => {
   const columns: Column[] = useMemo(() => {
     return [
       {
@@ -46,9 +53,7 @@ const DataTable = ({ entries }: DataTableProps) => {
         id: "location",
         accessor: "properties.place",
         disableSortBy: true,
-        Cell: ({ value }) => (
-          <p className="text-left">{value === null ? "N/A" : value}</p>
-        ),
+        Cell: ({ value }) => <p className="text-left">{value || "N/A"}</p>,
       },
       {
         Header: (
@@ -173,12 +178,15 @@ const DataTable = ({ entries }: DataTableProps) => {
               <tr
                 key={key}
                 {...restRowProps}
-                // onClick={() => {
-                //   toggleSelect(id);
-                // }}
-                className={`p-0 cursor-pointer relative transition-[background-color] duration-200 ease-in align-top  ${
-                  false ? "bg-green-200" : "bg-white"
-                }`}
+                onClick={() => {
+                  toggleSelectedRow(id);
+                }}
+                className={`p-0 relative ease-in align-top ${
+                  selectedRows[id]
+                    ? "bg-green-200"
+                    : "bg-white hover:bg-slate-200"
+                }
+                `}
               >
                 {row.cells.map((cell) => {
                   const { key, ...restCellProps } = cell.getCellProps();

@@ -5,13 +5,20 @@ import { useMemo } from "react";
 type EventCircleProps = {
   data: EarthquakeData;
   map: google.maps.Map;
+  isSelected: boolean;
+  toggleSelectedRow: (id: EarthquakeData["id"]) => void;
 };
 
-const EventCircle = ({ data, map }: EventCircleProps) => {
+const EventCircle = ({
+  data,
+  map,
+  toggleSelectedRow,
+  isSelected,
+}: EventCircleProps) => {
   const icon: google.maps.Symbol = {
     path: google.maps.SymbolPath.CIRCLE,
     scale: data.properties.mag * 5,
-    fillColor: "red",
+    fillColor: isSelected ? "green" : "red",
     fillOpacity: 0.25,
     strokeColor: "white",
     strokeWeight: 0.5,
@@ -19,7 +26,7 @@ const EventCircle = ({ data, map }: EventCircleProps) => {
 
   const infoWindow = useMemo(() => {
     return new google.maps.InfoWindow({
-      content: `<p>${data.properties.place}<br>Magnitude: ${
+      content: `<p>${data.properties.place || "N/A"}<br>Magnitude: ${
         data.properties.mag
       }<br>${new Date(data.properties.time).toLocaleString()}</p>`,
       position: {
@@ -39,6 +46,7 @@ const EventCircle = ({ data, map }: EventCircleProps) => {
       icon={icon}
       onMouseOver={() => infoWindow.open({ map: map })}
       onMouseOut={() => infoWindow.close()}
+      onClick={() => toggleSelectedRow(data.id)}
     />
   );
 };

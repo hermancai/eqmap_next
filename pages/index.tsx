@@ -1,8 +1,12 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import SearchForm from "@/components/home/SearchForm";
 import Map from "@/components/home/Map";
 import DataTable from "@/components/home/DataTable";
-import { USGSData } from "@/types/USGS";
+import { EarthquakeData, USGSData } from "@/types/USGS";
+
+export type SelectedRows = {
+  [key: EarthquakeData["id"]]: boolean;
+};
 
 export default function Home() {
   const [searchRadius, setSearchRadius] = useState<number>(3000);
@@ -12,6 +16,26 @@ export default function Home() {
   const [searchedCenter, setSearchedCenter] =
     useState<google.maps.LatLngLiteral | null>(null);
   const [data, setData] = useState<USGSData | null>(null);
+  const [selectedRows, setSelectedRows] = useState<SelectedRows>({});
+
+  useEffect(() => {
+    if (data === null) {
+      return setSelectedRows({});
+    }
+
+    const newSelectedRows: SelectedRows = {};
+    data.features.forEach((entry) => {
+      newSelectedRows[entry.id] = false;
+    });
+
+    setSelectedRows(newSelectedRows);
+  }, [data]);
+
+  const toggleSelectedRow = (id: EarthquakeData["id"]) => {
+    setSelectedRows((prev) => {
+      return { ...prev, [id]: !prev[id] };
+    });
+  };
 
   return (
     <main>
@@ -31,11 +55,17 @@ export default function Home() {
             searchedCenter={searchedCenter}
             searchRadius={searchRadius}
             data={data}
+            selectedRows={selectedRows}
+            toggleSelectedRow={toggleSelectedRow}
           />
         </div>
       </div>
       {data !== null && data.features.length > 1 ? (
-        <DataTable entries={data.features} />
+        <DataTable
+          entries={data.features}
+          selectedRows={selectedRows}
+          toggleSelectedRow={toggleSelectedRow}
+        />
       ) : null}
     </main>
   );

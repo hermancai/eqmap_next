@@ -11,8 +11,9 @@ import {
   Marker,
   Circle,
 } from "@react-google-maps/api";
-import { USGSData } from "@/types/USGS";
+import { EarthquakeData, USGSData } from "@/types/USGS";
 import EventCircle from "./EventCircle";
+import { SelectedRows } from "@/pages";
 
 type PinState = google.maps.Marker | null;
 type CircleState = google.maps.Circle | null;
@@ -23,6 +24,8 @@ type MapProps = {
   searchedCenter: google.maps.LatLngLiteral | null;
   searchRadius: number;
   data: USGSData | null;
+  selectedRows: SelectedRows;
+  toggleSelectedRow: (id: EarthquakeData["id"]) => void;
 };
 
 const API_KEY = process.env.NEXT_PUBLIC_MAP_API_KEY;
@@ -44,6 +47,8 @@ const Map = ({
   searchedCenter,
   searchRadius,
   data,
+  selectedRows,
+  toggleSelectedRow,
 }: MapProps) => {
   const { isLoaded } = useJsApiLoader({
     id: "google-map-script",
@@ -124,7 +129,15 @@ const Map = ({
           </Marker>
           {data !== null && map !== null
             ? data.features.map((entry) => {
-                return <EventCircle map={map} data={entry} key={entry.id} />;
+                return (
+                  <EventCircle
+                    map={map}
+                    data={entry}
+                    key={entry.id}
+                    toggleSelectedRow={toggleSelectedRow}
+                    isSelected={selectedRows[entry.id]}
+                  />
+                );
               })
             : null}
           <div
