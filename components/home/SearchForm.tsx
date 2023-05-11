@@ -9,6 +9,11 @@ import Slider from "@mui/material/Slider";
 import { fetchData } from "@/services/USGS";
 import { USGSData } from "@/types/USGS";
 import { motion, AnimatePresence } from "framer-motion";
+import {
+  QuestionMarkCircleIcon,
+  ArrowDownIcon,
+} from "@heroicons/react/24/outline";
+import Link from "next/link";
 
 const minMagnitudeRange = 0.1;
 
@@ -47,6 +52,7 @@ const SearchForm = ({
   const [validDates, setValidDates] = useState<boolean>(true);
   const [loading, setLoading] = useState<boolean>(false);
   const [longLoad, setLongLoad] = useState<boolean>(false);
+  const [showAboutSection, setShowAboutSection] = useState<boolean>(false);
 
   const handleDateChange = (
     e: ChangeEvent<HTMLInputElement>,
@@ -155,7 +161,7 @@ const SearchForm = ({
   }, [startDate, endDate]);
 
   return (
-    <div className="md:w-[24rem] md:h-screen flex flex-col items-center p-8 bg-slate-100 gap-8 overflow-auto">
+    <div className="md:w-[24rem] md:min-h-screen flex flex-col items-center p-8 bg-slate-100 gap-8 overflow-hidden relative">
       <h1 className="text-4xl text-center tracking-wide">EARTHQUAKE MAP</h1>
       <p className="text-center">Choose a location by clicking on the map.</p>
       <div className="w-full flex justify-between items-center gap-3">
@@ -201,6 +207,7 @@ const SearchForm = ({
             color: "#1e293b",
             height: "7px",
           }}
+          getAriaLabel={() => "magnitude-range-slider"}
         />
       </div>
       <div className="w-full flex flex-col">
@@ -218,6 +225,7 @@ const SearchForm = ({
             color: "#1e293b",
             height: "7px",
           }}
+          getAriaLabel={() => "search-radius-slider"}
         />
       </div>
       <div className="w-full flex flex-col">
@@ -235,6 +243,7 @@ const SearchForm = ({
             color: "#1e293b",
             height: "7px",
           }}
+          getAriaLabel={() => "result-limit-slider"}
         />
       </div>
       <button
@@ -248,44 +257,117 @@ const SearchForm = ({
           "SEARCH"
         )}
       </button>
-      <div className="w-full">
-        <AnimatePresence>
-          {longLoad && (
-            <motion.div
-              className="text-center w-full p-2 border-4 border-yellow-300 rounded"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.3 }}
-            >
-              <p>Gathering data...</p>
-              <p className="text-sm text-gray-500">
-                This may take some time depending on your search terms.
-              </p>
-            </motion.div>
-          )}
-        </AnimatePresence>
+      <AnimatePresence>
+        {longLoad && (
+          <motion.div
+            className="text-center w-full p-2 border-4 border-yellow-300 rounded"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+          >
+            <p>Gathering data...</p>
+            <p className="text-sm text-gray-500">
+              This may take some time depending on your search terms.
+            </p>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-        <AnimatePresence>
-          {data !== null && (
-            <motion.div
-              className="text-center w-full p-2 border-4 border-green-500 rounded"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.3 }}
-            >
-              <p className="text-lg">{`${data.features.length} Earthquake${
-                data.features.length === 1 ? "" : "s"
-              } Found`}</p>
-              {data.features.length > 1 ? (
-                <p className="text-sm text-gray-500">Scroll for more data</p>
-              ) : null}
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
+      <AnimatePresence>
+        {data !== null && (
+          <motion.div
+            className="text-center w-full p-2 border-4 border-green-500 rounded"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+          >
+            <p className="text-lg">{`${data.features.length} Earthquake${
+              data.features.length === 1 ? "" : "s"
+            } Found`}</p>
+            {data.features.length > 1 ? (
+              <p className="text-sm text-gray-500">Scroll for more data</p>
+            ) : null}
+          </motion.div>
+        )}
+      </AnimatePresence>
+      <QuestionMarkCircleIcon
+        className="h-7 self-end mt-auto text-slate-500 cursor-pointer hover:text-slate-800 transition-colors duration-200"
+        onClick={() => setShowAboutSection(!showAboutSection)}
+      />
+      <AboutSection show={showAboutSection} setShow={setShowAboutSection} />
     </div>
+  );
+};
+
+type AboutSectionProps = {
+  show: boolean;
+  setShow: Dispatch<SetStateAction<boolean>>;
+};
+
+const AboutSection = ({ show, setShow }: AboutSectionProps) => {
+  return (
+    <AnimatePresence>
+      {show && (
+        <motion.div
+          initial={{ height: 0, opacity: 0 }}
+          animate={{ height: "100%", opacity: 1 }}
+          exit={{ height: 0, opacity: 0 }}
+          transition={{ duration: 0.25 }}
+          className="absolute bottom-0 w-full bg-white p-8 gap-6 flex flex-col"
+        >
+          <p>
+            Built by{" "}
+            <Link
+              href="https://hermancai.dev"
+              target="_blank"
+              className="underline cursor-pointer"
+            >
+              Herman Cai
+            </Link>
+          </p>
+          <p>Data Source: U.S. Geological Survey</p>
+          <span className="h-0 border-t w-full border-slate-300" />
+          <div className="flex flex-col gap-3">
+            <p className="text-xl">Search Parameters</p>
+            <p>
+              Start/End:{" "}
+              <span className="font-light">
+                Choose a date range. The start date must be earlier than today.
+                The end date must be after the start date.
+              </span>
+            </p>
+            <p>
+              Magnitude Range:{" "}
+              <span className="font-light">
+                Choose a range of minimum and maximum magnitudes.
+              </span>
+            </p>
+            <p>
+              Search Radius:{" "}
+              <span className="font-light">
+                Choose a radius in kilometers, represented by the gray circle
+                around the map pin. The Earth has a circumference of about
+                40,000 kilometers.
+              </span>
+            </p>
+            <p>
+              Results:{" "}
+              <span className="font-light">
+                Choose a limit on the number of earthquakes to be found.
+                Priority is given to events with higher magnitude.
+              </span>
+            </p>
+          </div>
+
+          <ArrowDownIcon
+            className="h-7 shrink-0 self-end mt-auto text-slate-500 cursor-pointer hover:text-slate-800 transition-colors duration-200"
+            onClick={() => setShow(!show)}
+          />
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 };
 

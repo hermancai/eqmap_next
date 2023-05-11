@@ -48,7 +48,7 @@ export default function Home() {
           data={data}
           setData={setData}
         />
-        <div className="grow h-[75vh] md:h-screen">
+        <div className="grow h-[75vh] md:h-auto">
           <Map
             pinPosition={pinPosition}
             setPinPosition={setPinPosition}
