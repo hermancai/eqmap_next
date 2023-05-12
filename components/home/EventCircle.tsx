@@ -7,6 +7,7 @@ type EventCircleProps = {
   map: google.maps.Map;
   isSelected: boolean;
   toggleSelectedRow: (id: EarthquakeData["id"]) => void;
+  markerSize: number;
 };
 
 const EventCircle = ({
@@ -14,10 +15,11 @@ const EventCircle = ({
   map,
   toggleSelectedRow,
   isSelected,
+  markerSize,
 }: EventCircleProps) => {
   const icon: google.maps.Symbol = {
     path: google.maps.SymbolPath.CIRCLE,
-    scale: data.properties.mag * 5,
+    scale: data.properties.mag * markerSize,
     fillColor: isSelected ? "green" : "red",
     fillOpacity: 0.25,
     strokeColor: "white",
@@ -33,7 +35,7 @@ const EventCircle = ({
         lat: data.geometry.coordinates[1],
         lng: data.geometry.coordinates[0],
       },
-      pixelOffset: new google.maps.Size(0, data.properties.mag * -5),
+      pixelOffset: new google.maps.Size(0, data.properties.mag * -markerSize),
     });
   }, [data]);
 

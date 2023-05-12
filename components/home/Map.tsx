@@ -59,6 +59,7 @@ const Map = ({
   const [pin, setPin] = useState<PinState>(null);
   const [circle, setCircle] = useState<CircleState>(null);
   const [showPin, setShowPin] = useState<boolean>(true);
+  const [markerSize, setMarkerSize] = useState<number>(3);
 
   const onMapLoad = useCallback(
     (map: MapState) => {
@@ -136,15 +137,37 @@ const Map = ({
                     key={entry.id}
                     toggleSelectedRow={toggleSelectedRow}
                     isSelected={selectedRows[entry.id]}
+                    markerSize={markerSize}
                   />
                 );
               })
             : null}
-          <div
-            className="shadow-sm shadow-black text-sm absolute bottom-4 left-1/2 -translate-x-1/2 bg-slate-800 text-white rounded px-2 py-1 whitespace-nowrap hover:cursor-pointer hover:text-orange-500 transition-colors duration-200"
-            onClick={() => setShowPin(!showPin)}
-          >
-            {showPin ? "Hide" : "Show"} Pin
+          <div className="flex flex-row gap-2 absolute bottom-4 left-1/2 -translate-x-1/2 text-sm text-white whitespace-nowrap">
+            <div
+              className="shadow-sm shadow-black bg-slate-800 rounded px-2 py-1 hover:cursor-pointer hover:text-orange-500 transition-colors duration-200"
+              onClick={() => setShowPin(!showPin)}
+            >
+              {showPin ? "Hide" : "Show"} Pin
+            </div>
+            {data !== null && data.features.length > 0 ? (
+              <div className="flex flex-row gap-2 shadow-sm shadow-black bg-slate-800 rounded px-2 py-1">
+                <label htmlFor="select-marker-size">Marker Size:</label>
+                <select
+                  value={markerSize}
+                  className="bg-slate-800 cursor-pointer hover:text-orange-500 transition-colors duration-200"
+                  id="select-marker-size"
+                  onChange={(e) => setMarkerSize(Number(e.target.value))}
+                >
+                  {[0, 1, 2, 3, 4, 5].map((val) => {
+                    return (
+                      <option key={val} value={val} className="text-white">
+                        {val}
+                      </option>
+                    );
+                  })}
+                </select>
+              </div>
+            ) : null}
           </div>
         </>
       ) : null}
