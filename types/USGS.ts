@@ -10,7 +10,8 @@ type QueryValues = {
 };
 
 type EarthquakeData = {
-  geometry: { coordinates: number[] };
+  // coordinates list: longitude, latitude, depth (km)
+  geometry: { coordinates: [number, number, number] };
   properties: {
     mag: number;
     place: string;
