@@ -142,15 +142,15 @@ const Map = ({
                 );
               })
             : null}
-          <div className="flex flex-row gap-2 absolute bottom-4 left-1/2 -translate-x-1/2 text-sm text-white whitespace-nowrap">
+          <div className="flex flex-row gap-2 absolute bottom-4 left-1/2 -translate-x-1/2 text-sm text-white">
             <div
-              className="shadow-sm shadow-black bg-slate-800 rounded px-2 py-1 hover:cursor-pointer hover:text-orange-500 transition-colors duration-200"
+              className="shadow-sm shadow-black bg-slate-800 rounded px-2 py-1 hover:cursor-pointer hover:text-orange-500 transition-colors duration-200 flex justify-center items-center whitespace-nowrap"
               onClick={() => setShowPin(!showPin)}
             >
               {showPin ? "Hide" : "Show"} Pin
             </div>
             {data !== null && data.features.length > 0 ? (
-              <div className="flex flex-row gap-2 shadow-sm shadow-black bg-slate-800 rounded px-2 py-1">
+              <div className="flex flex-row gap-2 shadow-sm shadow-black bg-slate-800 rounded px-2 py-1 justify-center items-center whitespace-nowrap">
                 <label htmlFor="select-marker-size">Marker Size:</label>
                 <select
                   value={markerSize}

@@ -31,7 +31,7 @@ const PaginationButton = ({
   return (
     <button
       className={`${
-        condition ? "hover:text-orange-400" : "text-gray-500"
+        condition ? "hover:text-orange-400" : "text-slate-600"
       } text-white transition-[color] duration-200 ease-in`}
       onClick={() => handleClick()}
       disabled={!condition}
