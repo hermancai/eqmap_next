@@ -37,7 +37,7 @@ const EventCircle = ({
       },
       pixelOffset: new google.maps.Size(0, data.properties.mag * -markerSize),
     });
-  }, [data]);
+  }, [data, markerSize]);
 
   return (
     <Marker
