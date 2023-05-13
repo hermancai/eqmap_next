@@ -1,6 +1,7 @@
 import "@/styles/globals.css";
 import type { AppProps } from "next/app";
 import Head from "next/head";
+import Script from "next/script";
 
 export default function App({ Component, pageProps }: AppProps) {
   return (
@@ -38,6 +39,19 @@ export default function App({ Component, pageProps }: AppProps) {
         />
         <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#0f172a" />
       </Head>
+      <Script
+        src={`https://www.googletagmanager.com/gtag/js?id=G-Y5VMQFC5YN`}
+        strategy="afterInteractive"
+      />
+      <Script id="google-analytics" strategy="afterInteractive">
+        {`
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){window.dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', 'G-Y5VMQFC5YN');
+        `}
+      </Script>
       <Component {...pageProps} />
     </>
   );
