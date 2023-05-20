@@ -3,6 +3,7 @@ import SearchForm from "@/components/home/SearchForm";
 import Map from "@/components/home/Map";
 import DataTable from "@/components/home/DataTable";
 import { EarthquakeData, USGSData } from "@/types/USGS";
+import GraphSection from "@/components/home/GraphSection";
 
 export type SelectedRows = {
   [key: EarthquakeData["id"]]: boolean;
@@ -61,11 +62,14 @@ export default function Home() {
         </div>
       </div>
       {data !== null && data.features.length > 1 ? (
-        <DataTable
-          entries={data.features}
-          selectedRows={selectedRows}
-          toggleSelectedRow={toggleSelectedRow}
-        />
+        <div className="bg-slate-100 py-10 w-full flex flex-col items-center gap-10">
+          <DataTable
+            entries={data.features}
+            selectedRows={selectedRows}
+            toggleSelectedRow={toggleSelectedRow}
+          />
+          <GraphSection data={data.features} />
+        </div>
       ) : null}
     </main>
   );

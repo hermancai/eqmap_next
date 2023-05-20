@@ -117,150 +117,147 @@ const DataTable = ({
   );
 
   return (
-    <div className="bg-slate-100 overflow-x-auto text-sm sm:text-base py-10">
-      <table
-        {...getTableProps()}
-        className="border-separate border-spacing-0 border border-slate-800 m-auto w-full md:w-[768px] table-fixed overflow-hidden md:rounded md:shadow-sm md:shadow-gray-500"
-      >
-        <caption className="md:text-left pb-2 md:px-4">
-          Click on a row to highlight the event on the map.
-        </caption>
-        <thead>
-          {headerGroups.map((headerGroup) => {
-            const { key, ...restHeaderGroupProps } =
-              headerGroup.getHeaderGroupProps();
-            return (
-              <tr key={key} {...restHeaderGroupProps}>
-                {headerGroup.headers.map((column) => {
-                  const { key, ...restColumn } = column.getHeaderProps(
-                    column.getSortByToggleProps({ title: undefined })
-                  );
-                  return (
-                    <th
-                      key={key}
-                      {...restColumn}
-                      className={`${
-                        column.canSort ? "hover:text-orange-400" : ""
-                      } p-2 sm:px-4 bg-slate-800 text-white transition-colors duration-200 ease-in font-normal ${
-                        column.id === "location" ? "w-1/2" : ""
-                      } ${column.id === "date" ? "w-[30%]" : ""}
+    <table
+      {...getTableProps()}
+      className="text-sm sm:text-base border-separate border-spacing-0 border border-slate-800 w-full md:w-[768px] overflow-hidden table-fixed md:rounded md:shadow-sm md:shadow-gray-500"
+    >
+      <caption className="md:text-left pb-2 md:px-4">
+        Click on a row to highlight the event on the map.
+      </caption>
+      <thead>
+        {headerGroups.map((headerGroup) => {
+          const { key, ...restHeaderGroupProps } =
+            headerGroup.getHeaderGroupProps();
+          return (
+            <tr key={key} {...restHeaderGroupProps}>
+              {headerGroup.headers.map((column) => {
+                const { key, ...restColumn } = column.getHeaderProps(
+                  column.getSortByToggleProps({ title: undefined })
+                );
+                return (
+                  <th
+                    key={key}
+                    {...restColumn}
+                    className={`${
+                      column.canSort ? "hover:text-orange-400" : ""
+                    } p-2 sm:px-4 bg-slate-800 text-white transition-colors duration-200 ease-in font-normal ${
+                      column.id === "location" ? "w-1/2" : ""
+                    } ${column.id === "date" ? "w-[30%]" : ""}
                       `}
-                    >
-                      {column.id === "location" ? (
-                        column.render("Header")
-                      ) : (
-                        <div className="flex flex-row flex-nowrap gap-2 justify-end items-center">
-                          {column.isSorted ? (
-                            column.isSortedDesc ? (
-                              <ChevronDownIcon className="h-5 sm:stroke-[2] text-orange-400" />
-                            ) : (
-                              <ChevronUpIcon className="h-5 sm:stroke-[2] text-orange-400" />
-                            )
-                          ) : null}
-                          {column.render("Header")}
-                        </div>
-                      )}
-                    </th>
-                  );
-                })}
-              </tr>
-            );
-          })}
-        </thead>
-        <tbody {...getTableBodyProps()}>
-          {page.map((row) => {
-            prepareRow(row);
-            const { key, ...restRowProps } = row.getRowProps();
-            // row.original has type {}
-            // @ts-ignore
-            const id = row.original.id;
-            return (
-              <tr
-                key={key}
-                {...restRowProps}
-                onClick={() => {
-                  toggleSelectedRow(id);
-                }}
-                className={`p-0 relative ease-in align-top ${
-                  selectedRows[id]
-                    ? "bg-green-200"
-                    : "bg-white hover:bg-slate-200"
-                }
+                  >
+                    {column.id === "location" ? (
+                      column.render("Header")
+                    ) : (
+                      <div className="flex flex-row flex-nowrap gap-2 justify-end items-center">
+                        {column.isSorted ? (
+                          column.isSortedDesc ? (
+                            <ChevronDownIcon className="h-5 sm:stroke-[2] text-orange-400" />
+                          ) : (
+                            <ChevronUpIcon className="h-5 sm:stroke-[2] text-orange-400" />
+                          )
+                        ) : null}
+                        {column.render("Header")}
+                      </div>
+                    )}
+                  </th>
+                );
+              })}
+            </tr>
+          );
+        })}
+      </thead>
+      <tbody {...getTableBodyProps()}>
+        {page.map((row) => {
+          prepareRow(row);
+          const { key, ...restRowProps } = row.getRowProps();
+          // row.original has type {}
+          // @ts-ignore
+          const id = row.original.id;
+          return (
+            <tr
+              key={key}
+              {...restRowProps}
+              onClick={() => {
+                toggleSelectedRow(id);
+              }}
+              className={`p-0 relative ease-in align-top ${
+                selectedRows[id]
+                  ? "bg-green-200"
+                  : "bg-white hover:bg-slate-200"
+              }
                 `}
+            >
+              {row.cells.map((cell) => {
+                const { key, ...restCellProps } = cell.getCellProps();
+                return (
+                  <td
+                    key={key}
+                    {...restCellProps}
+                    className="p-2 sm:px-4 border-b border-b-slate-300"
+                  >
+                    {cell.render("Cell")}
+                  </td>
+                );
+              })}
+            </tr>
+          );
+        })}
+      </tbody>
+      <tfoot className="bg-slate-800 text-white">
+        <tr>
+          <td colSpan={3}>
+            <div className="flex flex-col sm:flex-row justify-center sm:justify-between items-center gap-4 p-2 sm:px-4">
+              <div className="flex flex-row justify-center items-center gap-4">
+                <PaginationButton
+                  condition={canPreviousPage}
+                  handleClick={() => gotoPage(0)}
+                >
+                  <ChevronDoubleLeftIcon className="h-5 sm:stroke-[2]" />
+                </PaginationButton>
+                <PaginationButton
+                  condition={canPreviousPage}
+                  handleClick={() => previousPage()}
+                >
+                  <ChevronLeftIcon className="h-5 sm:stroke-[2]" />
+                </PaginationButton>
+                <p>
+                  Page {pageIndex + 1} of {pageOptions.length}
+                </p>
+                <PaginationButton
+                  condition={canNextPage}
+                  handleClick={() => nextPage()}
+                >
+                  <ChevronRightIcon className="h-5 sm:stroke-[2]" />
+                </PaginationButton>
+                <PaginationButton
+                  condition={canNextPage}
+                  handleClick={() => gotoPage(pageCount - 1)}
+                >
+                  <ChevronDoubleRightIcon className="h-5 sm:stroke-[2]" />
+                </PaginationButton>
+              </div>
+              <select
+                className="cursor-pointer bg-slate-800 text-white hover:text-orange-400 transition-[color] duration-200 ease-in"
+                value={pageSize}
+                onChange={(e) => setPageSize(Number(e.target.value))}
               >
-                {row.cells.map((cell) => {
-                  const { key, ...restCellProps } = cell.getCellProps();
+                {[10, 20, 30, 40, 50].map((pageSize) => {
                   return (
-                    <td
-                      key={key}
-                      {...restCellProps}
-                      className="p-2 sm:px-4 border-b border-b-slate-300"
+                    <option
+                      key={pageSize}
+                      value={pageSize}
+                      className="text-white"
                     >
-                      {cell.render("Cell")}
-                    </td>
+                      {pageSize} Rows
+                    </option>
                   );
                 })}
-              </tr>
-            );
-          })}
-        </tbody>
-        <tfoot className="bg-slate-800 text-white">
-          <tr>
-            <td colSpan={3}>
-              <div className="flex flex-col sm:flex-row justify-center sm:justify-between items-center gap-4 p-2 sm:px-4">
-                <div className="flex flex-row justify-center items-center gap-4">
-                  <PaginationButton
-                    condition={canPreviousPage}
-                    handleClick={() => gotoPage(0)}
-                  >
-                    <ChevronDoubleLeftIcon className="h-5 sm:stroke-[2]" />
-                  </PaginationButton>
-                  <PaginationButton
-                    condition={canPreviousPage}
-                    handleClick={() => previousPage()}
-                  >
-                    <ChevronLeftIcon className="h-5 sm:stroke-[2]" />
-                  </PaginationButton>
-                  <p>
-                    Page {pageIndex + 1} of {pageOptions.length}
-                  </p>
-                  <PaginationButton
-                    condition={canNextPage}
-                    handleClick={() => nextPage()}
-                  >
-                    <ChevronRightIcon className="h-5 sm:stroke-[2]" />
-                  </PaginationButton>
-                  <PaginationButton
-                    condition={canNextPage}
-                    handleClick={() => gotoPage(pageCount - 1)}
-                  >
-                    <ChevronDoubleRightIcon className="h-5 sm:stroke-[2]" />
-                  </PaginationButton>
-                </div>
-                <select
-                  className="cursor-pointer bg-slate-800 text-white hover:text-orange-400 transition-[color] duration-200 ease-in"
-                  value={pageSize}
-                  onChange={(e) => setPageSize(Number(e.target.value))}
-                >
-                  {[10, 20, 30, 40, 50].map((pageSize) => {
-                    return (
-                      <option
-                        key={pageSize}
-                        value={pageSize}
-                        className="text-white"
-                      >
-                        {pageSize} Rows
-                      </option>
-                    );
-                  })}
-                </select>
-              </div>
-            </td>
-          </tr>
-        </tfoot>
-      </table>
-      <div></div>
-    </div>
+              </select>
+            </div>
+          </td>
+        </tr>
+      </tfoot>
+    </table>
   );
 };
 
