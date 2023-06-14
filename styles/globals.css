@@ -1,3 +1,8 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Removes X button from google InfoWindow */
+button.gm-ui-hover-effect {
+  visibility: hidden;
+}
