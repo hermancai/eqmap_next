@@ -13,7 +13,7 @@ import {
 } from "@react-google-maps/api";
 import { EarthquakeData, USGSData } from "@/types/USGS";
 import EventCircle from "./EventCircle";
-import { SelectedRows } from "@/app/page";
+import { SelectedRows } from "@/types/data";
 
 type PinState = google.maps.Marker | null;
 type CircleState = google.maps.Circle | null;

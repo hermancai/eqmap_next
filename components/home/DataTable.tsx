@@ -9,7 +9,7 @@ import {
     ChevronLeftIcon,
     ChevronRightIcon,
 } from "@heroicons/react/24/outline";
-import { SelectedRows } from "@/app/page";
+import { SelectedRows } from "@/types/data";
 
 type DataTableProps = {
     entries: EarthquakeData[];

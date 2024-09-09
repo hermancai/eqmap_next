@@ -6,10 +6,7 @@ import Map from "@/components/home/Map";
 import DataTable from "@/components/home/DataTable";
 import { EarthquakeData, USGSData } from "@/types/USGS";
 import GraphSection from "@/components/home/GraphSection";
-
-export type SelectedRows = {
-    [key: EarthquakeData["id"]]: boolean;
-};
+import { SelectedRows } from "@/types/data";
 
 export default function Home() {
     const [searchRadius, setSearchRadius] = useState<number>(3000);
