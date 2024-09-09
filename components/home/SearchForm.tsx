@@ -1,33 +1,22 @@
-import {
-    ChangeEvent,
-    Dispatch,
-    SetStateAction,
-    useEffect,
-    useState,
-} from "react";
-import Slider from "@mui/material/Slider";
+import { useEffect, useState } from "react";
 import { fetchData } from "@/services/USGS";
 import { USGSData } from "@/types/USGS";
 import { motion, AnimatePresence } from "framer-motion";
-import {
-    QuestionMarkCircleIcon,
-    ArrowDownIcon,
-} from "@heroicons/react/24/outline";
-import Link from "next/link";
+import { QuestionMarkCircleIcon } from "@heroicons/react/24/outline";
 import RadiusSlider from "./RadiusSlider";
 import ResultSlider from "./ResultSlider";
-
-const MIN_MAGNITUDE_RANGE = 0.1;
+import AboutSection from "./AboutSection";
+import MagnitudeSlider from "./MagnitudeSlider";
 
 type SearchFormProps = {
     searchRadius: number;
-    setSearchRadius: Dispatch<SetStateAction<number>>;
-    setSearchedCenter: Dispatch<
-        SetStateAction<google.maps.LatLngLiteral | null>
+    setSearchRadius: React.Dispatch<React.SetStateAction<number>>;
+    setSearchedCenter: React.Dispatch<
+        React.SetStateAction<google.maps.LatLngLiteral | null>
     >;
     pinPosition: google.maps.LatLngLiteral | null;
     data: USGSData | null;
-    setData: Dispatch<SetStateAction<USGSData | null>>;
+    setData: React.Dispatch<React.SetStateAction<USGSData | null>>;
 };
 
 // Handles timezone offset from UTC. Returns yyyy-mm-dd
@@ -59,32 +48,10 @@ const SearchForm = ({
     const [showAboutSection, setShowAboutSection] = useState<boolean>(false);
 
     const handleDateChange = (
-        e: ChangeEvent<HTMLInputElement>,
-        setDate: Dispatch<SetStateAction<string>>
+        e: React.ChangeEvent<HTMLInputElement>,
+        setDate: React.Dispatch<React.SetStateAction<string>>
     ) => {
         setDate(e.target.value);
-    };
-
-    const handleMagnitudeChange = (
-        e: Event,
-        newValue: number | number[],
-        activeThumb: number
-    ) => {
-        if (!Array.isArray(newValue)) {
-            return;
-        }
-
-        if (activeThumb === 0) {
-            setMagnitudeValues([
-                Math.min(newValue[0], magnitudeValues[1] - MIN_MAGNITUDE_RANGE),
-                magnitudeValues[1],
-            ]);
-        } else {
-            setMagnitudeValues([
-                magnitudeValues[0],
-                Math.max(newValue[1], magnitudeValues[0] + MIN_MAGNITUDE_RANGE),
-            ]);
-        }
     };
 
     const handleSearch = async () => {
@@ -182,27 +149,10 @@ const SearchForm = ({
                     } outline-none outline-offset-0 w-[10rem] hover:cursor-pointer hover:border-slate-800 transition-colors duration-200`}
                 />
             </div>
-            <div className="w-full flex flex-col">
-                <div className="w-full flex justify-between">
-                    <label>Magnitude Range</label>
-                    <p>
-                        {magnitudeValues[0].toFixed(1)} -{" "}
-                        {magnitudeValues[1].toFixed(1)}
-                    </p>
-                </div>
-                <Slider
-                    value={magnitudeValues}
-                    onChange={handleMagnitudeChange}
-                    min={0}
-                    max={10}
-                    step={0.1}
-                    sx={{
-                        color: "#1e293b",
-                        height: "7px",
-                    }}
-                    getAriaLabel={() => "magnitude-range-slider"}
-                />
-            </div>
+            <MagnitudeSlider
+                magnitudeValues={magnitudeValues}
+                setMagnitudeValues={setMagnitudeValues}
+            />
             <RadiusSlider
                 searchRadius={searchRadius}
                 setSearchRadius={setSearchRadius}
@@ -268,79 +218,6 @@ const SearchForm = ({
                 setShow={setShowAboutSection}
             />
         </div>
-    );
-};
-
-type AboutSectionProps = {
-    show: boolean;
-    setShow: Dispatch<SetStateAction<boolean>>;
-};
-
-const AboutSection = ({ show, setShow }: AboutSectionProps) => {
-    return (
-        <AnimatePresence>
-            {show && (
-                <motion.div
-                    initial={{ height: 0, opacity: 0 }}
-                    animate={{ height: "100%", opacity: 1 }}
-                    exit={{ height: 0, opacity: 0 }}
-                    transition={{ duration: 0.25 }}
-                    className="absolute bottom-0 w-full bg-white p-8 gap-6 flex flex-col"
-                >
-                    <p>
-                        Built by{" "}
-                        <Link
-                            href="https://hermancai.dev"
-                            target="_blank"
-                            className="underline cursor-pointer"
-                        >
-                            Herman Cai
-                        </Link>
-                    </p>
-                    <p>Data Source: U.S. Geological Survey</p>
-                    <span className="h-0 border-t w-full border-slate-300" />
-                    <div className="flex flex-col gap-3">
-                        <p className="text-xl">Search Parameters</p>
-                        <p>
-                            Start/End:{" "}
-                            <span className="font-light">
-                                Choose a date range. The start date must be
-                                earlier than today. The end date must be after
-                                the start date.
-                            </span>
-                        </p>
-                        <p>
-                            Magnitude Range:{" "}
-                            <span className="font-light">
-                                Choose a range of minimum and maximum
-                                magnitudes.
-                            </span>
-                        </p>
-                        <p>
-                            Search Radius:{" "}
-                            <span className="font-light">
-                                Choose a radius in kilometers, represented by
-                                the gray circle around the map pin. The Earth
-                                has a circumference of about 40,000 kilometers.
-                            </span>
-                        </p>
-                        <p>
-                            Results:{" "}
-                            <span className="font-light">
-                                Choose a limit on the number of earthquakes to
-                                be found. Priority is given to events with
-                                higher magnitude.
-                            </span>
-                        </p>
-                    </div>
-
-                    <ArrowDownIcon
-                        className="h-7 shrink-0 self-end mt-auto text-slate-500 cursor-pointer hover:text-slate-800 transition-colors duration-200"
-                        onClick={() => setShow(!show)}
-                    />
-                </motion.div>
-            )}
-        </AnimatePresence>
     );
 };
 
