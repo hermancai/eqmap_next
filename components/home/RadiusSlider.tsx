@@ -29,7 +29,9 @@ export default function RadiusSlider({
         <div className="w-full flex flex-col">
             <div className="w-full flex justify-between">
                 <label>Search Radius</label>
-                <p>{searchRadius} km</p>
+                <p>{`${searchRadius} km (${Math.round(
+                    searchRadius / 1.609
+                )} mi)`}</p>
             </div>
             <Slider
                 value={Math.log10(searchRadius)}
