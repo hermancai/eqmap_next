@@ -1,5 +1,6 @@
 import "./globals.css";
 import type { Metadata, Viewport } from "next";
+import { GoogleAnalytics } from "@next/third-parties/google";
 
 export const metadata: Metadata = {
     title: "Earthquake Map",
@@ -22,6 +23,7 @@ export default function RootLayout({
     return (
         <html lang="en">
             <body>{children}</body>
+            <GoogleAnalytics gaId="G-Y5VMQFC5YN" />
         </html>
     );
 }
