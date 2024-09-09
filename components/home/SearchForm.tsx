@@ -14,8 +14,10 @@ import {
     ArrowDownIcon,
 } from "@heroicons/react/24/outline";
 import Link from "next/link";
+import RadiusSlider from "./RadiusSlider";
+import ResultSlider from "./ResultSlider";
 
-const minMagnitudeRange = 0.1;
+const MIN_MAGNITUDE_RANGE = 0.1;
 
 type SearchFormProps = {
     searchRadius: number;
@@ -50,7 +52,7 @@ const SearchForm = ({
     const [magnitudeValues, setMagnitudeValues] = useState<[number, number]>([
         7.5, 10,
     ]);
-    const [results, setResults] = useState<number>(100);
+    const [results, setResults] = useState<number>(50);
     const [validDates, setValidDates] = useState<boolean>(true);
     const [loading, setLoading] = useState<boolean>(false);
     const [longLoad, setLongLoad] = useState<boolean>(false);
@@ -74,31 +76,15 @@ const SearchForm = ({
 
         if (activeThumb === 0) {
             setMagnitudeValues([
-                Math.min(newValue[0], magnitudeValues[1] - minMagnitudeRange),
+                Math.min(newValue[0], magnitudeValues[1] - MIN_MAGNITUDE_RANGE),
                 magnitudeValues[1],
             ]);
         } else {
             setMagnitudeValues([
                 magnitudeValues[0],
-                Math.max(newValue[1], magnitudeValues[0] + minMagnitudeRange),
+                Math.max(newValue[1], magnitudeValues[0] + MIN_MAGNITUDE_RANGE),
             ]);
         }
-    };
-
-    const handleSearchRadiusChange = (
-        e: Event,
-        newValue: number | number[],
-        activeThumb: number
-    ) => {
-        setSearchRadius(newValue as number);
-    };
-
-    const handleResultsChange = (
-        e: Event,
-        newValue: number | number[],
-        activeThumb: number
-    ) => {
-        setResults(newValue as number);
     };
 
     const handleSearch = async () => {
@@ -217,42 +203,11 @@ const SearchForm = ({
                     getAriaLabel={() => "magnitude-range-slider"}
                 />
             </div>
-            <div className="w-full flex flex-col">
-                <div className="w-full flex justify-between">
-                    <label>Search Radius</label>
-                    <p>{searchRadius} km</p>
-                </div>
-                <Slider
-                    value={searchRadius}
-                    onChange={handleSearchRadiusChange}
-                    min={100}
-                    max={20000}
-                    step={100}
-                    sx={{
-                        color: "#1e293b",
-                        height: "7px",
-                    }}
-                    getAriaLabel={() => "search-radius-slider"}
-                />
-            </div>
-            <div className="w-full flex flex-col">
-                <div className="w-full flex justify-between">
-                    <label>Results</label>
-                    <p>{results}</p>
-                </div>
-                <Slider
-                    value={results}
-                    onChange={handleResultsChange}
-                    min={10}
-                    max={1000}
-                    step={10}
-                    sx={{
-                        color: "#1e293b",
-                        height: "7px",
-                    }}
-                    getAriaLabel={() => "result-limit-slider"}
-                />
-            </div>
+            <RadiusSlider
+                searchRadius={searchRadius}
+                setSearchRadius={setSearchRadius}
+            />
+            <ResultSlider results={results} setResults={setResults} />
             <button
                 className="shadow-sm shadow-gray-500 w-24 h-10 text-white bg-slate-800 py-2 px-4 rounded disabled:bg-slate-500 flex justify-center items-center hover:text-orange-400 transition-colors duration-200"
                 onClick={handleSearch}
