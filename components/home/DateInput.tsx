@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { getClientTodayISOString } from "@/services/date";
+import CheckboxInput from "./CheckboxInput";
 
 interface DateInputProps {
     startDate: string;
@@ -10,6 +10,10 @@ interface DateInputProps {
     setEndDate: React.Dispatch<React.SetStateAction<string>>;
     validDates: boolean;
     setValidDates: React.Dispatch<React.SetStateAction<boolean>>;
+    startDateChecked: boolean;
+    setStartDateChecked: React.Dispatch<React.SetStateAction<boolean>>;
+    endDateChecked: boolean;
+    setEndDateChecked: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export default function DateInput({
@@ -19,29 +23,18 @@ export default function DateInput({
     setEndDate,
     validDates,
     setValidDates,
+    startDateChecked,
+    setStartDateChecked,
+    endDateChecked,
+    setEndDateChecked,
 }: DateInputProps) {
-    // Date validation
-    useEffect(() => {
-        if (!startDate || !endDate) {
-            return setValidDates(false); // Missing dates
-        }
+    const toggleStartDateChecked = () => {
+        setStartDateChecked((prev) => !prev);
+    };
 
-        const start = new Date(startDate);
-        if (start > new Date(endDate)) {
-            return setValidDates(false); // Start greater than end
-        }
-
-        const today = new Date(getClientTodayISOString());
-        if (start >= today) {
-            return setValidDates(false); // Start greater than today
-        }
-
-        if (startDate === endDate) {
-            return setValidDates(false); // Equal dates
-        }
-
-        setValidDates(true);
-    }, [startDate, endDate]);
+    const toggleEndDateChecked = () => {
+        setEndDateChecked((prev) => !prev);
+    };
 
     const handleDateChange = (
         e: React.ChangeEvent<HTMLInputElement>,
@@ -50,34 +43,106 @@ export default function DateInput({
         setDate(e.target.value);
     };
 
+    // Date validation
+    useEffect(() => {
+        // Both checkboxes are checked
+        if (startDateChecked && endDateChecked) {
+            return setValidDates(true);
+        }
+
+        // If startDateChecked, endDate can be any valid date
+        if (startDateChecked) {
+            return setValidDates(endDate ? true : false);
+        }
+
+        // If endDateChecked, startDate must be before today
+        if (endDateChecked) {
+            // Comparing an Invalid Date will return false
+            return setValidDates(new Date(startDate) < new Date());
+        }
+
+        // Neither checkbox is checked
+        return setValidDates(new Date(startDate) < new Date(endDate));
+    }, [startDate, endDate, startDateChecked, endDateChecked, setValidDates]);
+
     return (
         <>
-            <div className="w-full flex justify-between items-center gap-3">
-                <label htmlFor="startDate">Start</label>
-                <span className="relative h-full grow border-t-[1px] border-slate-300 top-1/2" />
+            <div className="grid grid-rows-2 grid-cols-[auto_1fr_auto] w-full gap-y-1">
+                <label htmlFor="startDate" className="w-min flex items-center">
+                    Start
+                </label>
+                <StraightLineSpan checked={startDateChecked} />
                 <input
                     type="date"
                     id="startDate"
                     value={startDate}
                     onChange={(e) => handleDateChange(e, setStartDate)}
-                    className={`p-1 rounded border-2 border-gray-400 ${
+                    disabled={startDateChecked}
+                    className={`p-1 rounded border-2 transition-colors duration-200 ${
                         validDates ? "focus:border-slate-800" : "border-red-500"
-                    }  outline-none outline-offset-0 w-[10rem] hover:cursor-pointer hover:border-slate-800 transition-colors duration-200`}
+                    }  outline-none outline-offset-0 w-[10rem] hover:cursor-pointer hover:border-slate-800 disabled:bg-gray-200 disabled:text-gray-500 disabled:cursor-default disabled:border-gray-400`}
+                />
+                <BentLineSpan checked={startDateChecked} />
+                <CheckboxInput
+                    label="30 Days Before"
+                    checked={startDateChecked}
+                    handleOnChange={toggleStartDateChecked}
                 />
             </div>
-            <div className="w-full flex justify-between items-center gap-3">
-                <label htmlFor="endDate">End</label>
-                <span className="relative h-full grow border-t-[1px] border-slate-300 top-1/2" />
+
+            <div className="grid grid-rows-2 grid-cols-[auto_1fr_auto] w-full gap-y-1">
+                <label htmlFor="endDate" className="w-min flex items-center">
+                    End
+                </label>
+                <StraightLineSpan checked={endDateChecked} />
                 <input
                     type="date"
                     id="endDate"
                     value={endDate}
                     onChange={(e) => handleDateChange(e, setEndDate)}
-                    className={`p-1 rounded border-2 border-gray-400 ${
+                    disabled={endDateChecked}
+                    className={`p-1 rounded border-2 transition-colors duration-200 ${
                         validDates ? "focus:border-slate-800" : "border-red-500"
-                    } outline-none outline-offset-0 w-[10rem] hover:cursor-pointer hover:border-slate-800 transition-colors duration-200`}
+                    }  outline-none outline-offset-0 w-[10rem] hover:cursor-pointer hover:border-slate-800 disabled:bg-gray-200 disabled:text-gray-500 disabled:cursor-default disabled:border-gray-400`}
+                />
+                <BentLineSpan checked={endDateChecked} />
+                <CheckboxInput
+                    label="Current Time"
+                    checked={endDateChecked}
+                    handleOnChange={toggleEndDateChecked}
                 />
             </div>
+        </>
+    );
+}
+
+interface LineSpanProps {
+    checked: boolean;
+}
+
+function StraightLineSpan({ checked }: LineSpanProps) {
+    return (
+        <span
+            className={`relative h-full border-b-[2px] bottom-1/2 mx-4 transition-colors ${
+                checked ? "border-slate-300" : "border-slate-900"
+            }`}
+        />
+    );
+}
+
+function BentLineSpan({ checked }: LineSpanProps) {
+    return (
+        <>
+            <span
+                className={`relative h-1/2 w-1/2 border-b-[2px] border-l-[2px] left-1/2 transition-colors ${
+                    checked ? "border-slate-900" : "border-slate-300"
+                }`}
+            />
+            <span
+                className={`relative h-full border-b-[2px] bottom-1/2 mr-4 transition-colors ${
+                    checked ? "border-slate-900" : "border-slate-300"
+                }`}
+            />
         </>
     );
 }

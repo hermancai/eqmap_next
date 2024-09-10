@@ -5,7 +5,6 @@ import { fetchData } from "@/services/USGS";
 import { USGSData } from "@/types/USGS";
 import { motion, AnimatePresence } from "framer-motion";
 import { QuestionMarkCircleIcon } from "@heroicons/react/24/outline";
-import { getClientTodayISOString } from "@/services/date";
 import DateInput from "./DateInput";
 import MagnitudeSlider from "./MagnitudeSlider";
 import RadiusSlider from "./RadiusSlider";
@@ -33,13 +32,14 @@ const SearchForm = ({
 }: SearchFormProps) => {
     // Dates in yyyy/mm/dd format
     const [startDate, setStartDate] = useState<string>("1900-01-01");
-    const [endDate, setEndDate] = useState<string>(getClientTodayISOString());
-
+    const [endDate, setEndDate] = useState<string>("2020-01-01");
+    const [startDateChecked, setStartDateChecked] = useState<boolean>(false);
+    const [endDateChecked, setEndDateChecked] = useState<boolean>(true);
+    const [validDates, setValidDates] = useState<boolean>(true);
     const [magnitudeValues, setMagnitudeValues] = useState<[number, number]>([
         7.5, 10,
     ]);
     const [results, setResults] = useState<number>(50);
-    const [validDates, setValidDates] = useState<boolean>(true);
 
     const [loading, setLoading] = useState<boolean>(false);
     const [longLoad, setLongLoad] = useState<boolean>(false);
@@ -62,6 +62,8 @@ const SearchForm = ({
                 lng: pinPosition.lng,
                 startDate,
                 endDate,
+                startDateChecked,
+                endDateChecked,
                 minMag: magnitudeValues[0],
                 maxMag: magnitudeValues[1],
                 searchRadius,
@@ -98,6 +100,10 @@ const SearchForm = ({
                 setEndDate={setEndDate}
                 validDates={validDates}
                 setValidDates={setValidDates}
+                startDateChecked={startDateChecked}
+                setStartDateChecked={setStartDateChecked}
+                endDateChecked={endDateChecked}
+                setEndDateChecked={setEndDateChecked}
             />
             <MagnitudeSlider
                 magnitudeValues={magnitudeValues}

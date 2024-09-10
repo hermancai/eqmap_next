@@ -14,31 +14,30 @@ import { QueryValues, USGSData } from "@/types/USGS";
  */
 
 const buildURL = (data: QueryValues): string => {
-  let baseURL =
-    "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&orderby=magnitude";
+    let baseURL =
+        "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&orderby=magnitude";
 
-  baseURL = baseURL.concat(
-    `&starttime=${data.startDate}&endtime=${data.endDate}`
-  );
+    const start = data.startDateChecked ? "" : `&starttime=${data.startDate}`;
+    const end = data.endDateChecked ? "" : `&endtime=${data.endDate}`;
 
-  baseURL = baseURL.concat(
-    `&latitude=${data.lat}&longitude=${data.lng}&maxradiuskm=${data.searchRadius}&minmagnitude=${data.minMag}&maxmagnitude=${data.maxMag}&limit=${data.resultLimit}`
-  );
+    baseURL = baseURL.concat(
+        `${start}${end}&latitude=${data.lat}&longitude=${data.lng}&maxradiuskm=${data.searchRadius}&minmagnitude=${data.minMag}&maxmagnitude=${data.maxMag}&limit=${data.resultLimit}`
+    );
 
-  return baseURL;
+    return baseURL;
 };
 
 const fetchData = async (data: QueryValues) => {
-  const url = buildURL(data);
+    const url = buildURL(data);
 
-  const response = await fetch(url);
-  const res = (await response.json()) as USGSData;
+    const response = await fetch(url);
+    const res = (await response.json()) as USGSData;
 
-  if (response.status !== 200) {
-    throw Error("Fetching data failed");
-  }
+    if (response.status !== 200) {
+        throw Error("Fetching data failed");
+    }
 
-  return res;
+    return res;
 };
 
 export { fetchData };

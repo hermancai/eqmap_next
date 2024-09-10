@@ -3,6 +3,8 @@ type QueryValues = {
     lng: number;
     startDate: string;
     endDate: string;
+    startDateChecked: boolean;
+    endDateChecked: boolean;
     minMag: number;
     maxMag: number;
     searchRadius: number;
