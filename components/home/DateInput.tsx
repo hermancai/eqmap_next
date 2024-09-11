@@ -78,7 +78,7 @@ export default function DateInput({
                     value={startDate}
                     onChange={(e) => handleDateChange(e, setStartDate)}
                     disabled={startDateChecked}
-                    className={`p-1 rounded border-2 transition-colors duration-200 ${
+                    className={`form-input p-1 rounded border-2 transition-colors duration-200 ${
                         validDates ? "focus:border-slate-800" : "border-red-500"
                     }  outline-none outline-offset-0 w-[10rem] hover:cursor-pointer hover:border-slate-800 disabled:bg-gray-200 disabled:text-gray-500 disabled:cursor-default disabled:border-gray-400`}
                 />
@@ -101,7 +101,7 @@ export default function DateInput({
                     value={endDate}
                     onChange={(e) => handleDateChange(e, setEndDate)}
                     disabled={endDateChecked}
-                    className={`p-1 rounded border-2 transition-colors duration-200 ${
+                    className={`form-input p-1 rounded border-2 transition-colors duration-200 ${
                         validDates ? "focus:border-slate-800" : "border-red-500"
                     }  outline-none outline-offset-0 w-[10rem] hover:cursor-pointer hover:border-slate-800 disabled:bg-gray-200 disabled:text-gray-500 disabled:cursor-default disabled:border-gray-400`}
                 />
