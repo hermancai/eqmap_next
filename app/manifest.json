@@ -1,0 +1,8 @@
+{
+    "name": "Earthquake Map",
+    "short_name": "EQ Map",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#f1f5f9",
+    "theme_color": "#f1f5f9"
+}

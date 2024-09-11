@@ -1,0 +1,13 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Removes close button from Google InfoWindow */
+button.gm-ui-hover-effect, .gm-style-iw-chr {
+  display: none !important;
+}
+
+/* Apply custom padding to Google InfoWindow */
+.gm-style .gm-style-iw {
+  padding: 0.5rem !important;
+}
