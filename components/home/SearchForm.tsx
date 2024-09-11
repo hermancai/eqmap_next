@@ -115,7 +115,7 @@ const SearchForm = ({
             />
             <ResultSlider results={results} setResults={setResults} />
             <button
-                className="shadow-sm shadow-gray-500 w-24 h-10 text-white bg-slate-800 py-2 px-4 rounded disabled:bg-slate-500 flex justify-center items-center hover:text-orange-400 transition-colors duration-200"
+                className="shadow-sm shadow-gray-500 w-24 h-10 text-white bg-slate-800 py-2 px-4 rounded disabled:bg-slate-500 flex justify-center items-center enabled:hover:text-orange-400 transition-colors"
                 onClick={handleSearch}
                 disabled={!validDates || loading}
             >

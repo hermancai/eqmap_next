@@ -19,6 +19,7 @@ export default function CheckboxInput({
         >
             <input
                 type="checkbox"
+                name={`checkbox-${label}`}
                 checked={checked}
                 onChange={handleOnChange}
                 className="form-checkbox cursor-pointer text-slate-700 rounded w-5 h-5"

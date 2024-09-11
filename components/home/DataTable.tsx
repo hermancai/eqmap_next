@@ -253,7 +253,8 @@ const DataTable = ({
                                 </PaginationButton>
                             </div>
                             <select
-                                className="cursor-pointer bg-slate-800 text-white hover:text-orange-400 transition-[color] duration-200 ease-in"
+                                name="select-page-size"
+                                className="cursor-pointer bg-slate-800 text-white hover:text-orange-400 transition-colors border-0"
                                 value={pageSize}
                                 onChange={(e) =>
                                     setPageSize(Number(e.target.value))

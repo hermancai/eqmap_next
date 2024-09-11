@@ -26,7 +26,7 @@ export default function ResultSlider({
     return (
         <div className="w-full flex flex-col">
             <div className="w-full flex justify-between">
-                <label>Results</label>
+                <p>Results</p>
                 <p>{results}</p>
             </div>
             <Slider

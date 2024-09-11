@@ -38,7 +38,7 @@ export default function MagnitudeSlider({
     return (
         <div className="w-full flex flex-col">
             <div className="w-full flex justify-between">
-                <label>Magnitude Range</label>
+                <p>Magnitude Range</p>
                 <p>
                     {magnitudeValues[0].toFixed(1)} -{" "}
                     {magnitudeValues[1].toFixed(1)}

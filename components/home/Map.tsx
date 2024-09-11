@@ -150,13 +150,14 @@ const Map = ({
                             {showPin ? "Hide" : "Show"} Pin
                         </div>
                         {data !== null && data.features.length > 0 ? (
-                            <div className="flex flex-row gap-2 shadow-sm shadow-black bg-slate-800 rounded px-2 py-1 justify-center items-center whitespace-nowrap">
-                                <label htmlFor="select-marker-size">
-                                    Marker Size:
-                                </label>
+                            <label
+                                htmlFor="select-marker-size"
+                                className="relative hover:text-orange-500 transition-colors whitespace-nowrap shadow-sm shadow-black bg-slate-800 rounded px-2 py-1"
+                            >
+                                Marker Size: {markerSize}
                                 <select
                                     value={markerSize}
-                                    className="bg-slate-800 cursor-pointer hover:text-orange-500 transition-colors duration-200"
+                                    className="absolute top-0 left-0 w-full h-full opacity-0 bg-slate-800 cursor-pointer [direction:rtl]"
                                     id="select-marker-size"
                                     onChange={(e) =>
                                         setMarkerSize(Number(e.target.value))
@@ -174,7 +175,7 @@ const Map = ({
                                         );
                                     })}
                                 </select>
-                            </div>
+                            </label>
                         ) : null}
                     </div>
                 </>
