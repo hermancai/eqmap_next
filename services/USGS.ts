@@ -27,10 +27,13 @@ const buildURL = (data: QueryValues): string => {
     return baseURL;
 };
 
-const fetchData = async (data: QueryValues) => {
+const fetchData = async (
+    data: QueryValues,
+    signal: AbortController["signal"]
+) => {
     const url = buildURL(data);
 
-    const response = await fetch(url);
+    const response = await fetch(url, { signal });
     const res = (await response.json()) as USGSData;
 
     if (response.status !== 200) {
