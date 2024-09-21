@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { fetchData } from "@/services/USGS";
 import { USGSData } from "@/types/USGS";
 import { motion, AnimatePresence } from "framer-motion";
@@ -41,6 +41,7 @@ const SearchForm = ({
     ]);
     const [results, setResults] = useState<number>(50);
 
+    const abortControllerRef = useRef<AbortController | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
     const [longLoad, setLongLoad] = useState<boolean>(false);
     const [showAboutSection, setShowAboutSection] = useState<boolean>(false);
@@ -52,23 +53,28 @@ const SearchForm = ({
 
         setLoading(true);
         setData(null);
+        abortControllerRef.current = new AbortController();
+
         const timeoutId = setTimeout(() => {
             setLongLoad(true);
         }, 3000);
 
         try {
-            const data = await fetchData({
-                lat: pinPosition.lat,
-                lng: pinPosition.lng,
-                startDate,
-                endDate,
-                startDateChecked,
-                endDateChecked,
-                minMag: magnitudeValues[0],
-                maxMag: magnitudeValues[1],
-                searchRadius,
-                resultLimit: results,
-            });
+            const data = await fetchData(
+                {
+                    lat: pinPosition.lat,
+                    lng: pinPosition.lng,
+                    startDate,
+                    endDate,
+                    startDateChecked,
+                    endDateChecked,
+                    minMag: magnitudeValues[0],
+                    maxMag: magnitudeValues[1],
+                    searchRadius,
+                    resultLimit: results,
+                },
+                abortControllerRef.current.signal
+            );
             setSearchedCenter(pinPosition);
             clearTimeout(timeoutId);
             setLongLoad(false);
@@ -76,12 +82,21 @@ const SearchForm = ({
             setTimeout(() => {
                 setData(data);
             }, 300);
-        } catch {
-            alert("An error occurred while communicating with USGS.");
+        } catch (error) {
+            if (error instanceof Error && error.name !== "AbortError") {
+                alert("An error occurred while communicating with USGS.");
+            }
             clearTimeout(timeoutId);
             setLongLoad(false);
         } finally {
             setLoading(false);
+        }
+    };
+
+    const cancelSearch = () => {
+        if (abortControllerRef.current) {
+            abortControllerRef.current.abort();
+            abortControllerRef.current = null;
         }
     };
 
@@ -128,7 +143,7 @@ const SearchForm = ({
             <AnimatePresence>
                 {longLoad && (
                     <motion.div
-                        className="text-center w-full p-2 border-4 border-yellow-300 rounded"
+                        className="text-center w-full p-2 border-2 border-yellow-400 rounded"
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
@@ -139,6 +154,12 @@ const SearchForm = ({
                             This may take some time depending on your search
                             terms.
                         </p>
+                        <button
+                            onClick={cancelSearch}
+                            className="text-sm underline rounded p-1 hover:bg-slate-300 transition-colors"
+                        >
+                            Cancel Search
+                        </button>
                     </motion.div>
                 )}
             </AnimatePresence>
@@ -146,7 +167,7 @@ const SearchForm = ({
             <AnimatePresence>
                 {data !== null && (
                     <motion.div
-                        className="text-center w-full p-2 border-4 border-green-500 rounded"
+                        className="text-center w-full p-2 border-2 border-green-500 rounded"
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
