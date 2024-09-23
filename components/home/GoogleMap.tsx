@@ -1,26 +1,21 @@
 import {
-    Dispatch,
-    SetStateAction,
-    useCallback,
-    useEffect,
-    useState,
-} from "react";
-import {
-    GoogleMap,
-    useJsApiLoader,
-    Marker,
-    Circle,
-} from "@react-google-maps/api";
-import { EarthquakeData, USGSData } from "@/types/USGS";
-import EventCircle from "./EventCircle";
+    Map,
+    AdvancedMarker,
+    useMap,
+    Pin,
+    MapMouseEvent,
+} from "@vis.gl/react-google-maps";
+import { Circle } from "./Circle";
+import { USGSData, EarthquakeData } from "@/types/USGS";
 import { SelectedRows } from "@/types/data";
+import { Dispatch, SetStateAction, useState, useEffect } from "react";
+import EventCircle from "./EventCircle";
 
-type PinState = google.maps.Marker | null;
-type CircleState = google.maps.Circle | null;
-type MapState = google.maps.Map | null;
-type MapProps = {
-    pinPosition: google.maps.LatLngLiteral | null;
-    setPinPosition: Dispatch<SetStateAction<google.maps.LatLngLiteral | null>>;
+const MAP_ID = process.env.NEXT_PUBLIC_MAP_ID;
+
+type GoogleMapProps = {
+    pinPosition: google.maps.LatLngLiteral;
+    setPinPosition: Dispatch<SetStateAction<google.maps.LatLngLiteral>>;
     searchedCenter: google.maps.LatLngLiteral | null;
     searchRadius: number;
     data: USGSData | null;
@@ -28,20 +23,7 @@ type MapProps = {
     toggleSelectedRow: (id: EarthquakeData["id"]) => void;
 };
 
-const API_KEY = process.env.NEXT_PUBLIC_MAP_API_KEY;
-
-const containerStyle = {
-    width: "100%",
-    height: "100%",
-} as React.CSSProperties;
-
-const defaultCenter = {
-    lat: 38.46,
-    lng: -144.56,
-} as google.maps.LatLngLiteral;
-
-// NOTE: Two circles are rendered in strict mode.
-const Map = ({
+export default function GoogleMap({
     pinPosition,
     setPinPosition,
     searchedCenter,
@@ -49,38 +31,22 @@ const Map = ({
     data,
     selectedRows,
     toggleSelectedRow,
-}: MapProps) => {
-    const { isLoaded } = useJsApiLoader({
-        id: "google-map-script",
-        googleMapsApiKey: API_KEY!,
-    });
-
-    const [map, setMap] = useState<MapState>(null);
-    const [pin, setPin] = useState<PinState>(null);
-    const [circle, setCircle] = useState<CircleState>(null);
+}: GoogleMapProps) {
+    const map = useMap();
     const [showPin, setShowPin] = useState<boolean>(true);
     const [markerSize, setMarkerSize] = useState<number>(3);
 
-    const onMapLoad = useCallback(
-        (map: MapState) => {
-            if (map === null) return;
-            setMap(map);
-            setPinPosition(defaultCenter);
-        },
-        [setPinPosition]
-    );
-
-    const updatePinPosition = (e: google.maps.MapMouseEvent) => {
-        if (e.latLng === null || !showPin) return;
-        setPinPosition({ lat: e.latLng.lat(), lng: e.latLng.lng() });
+    const handleMapClick = (e: MapMouseEvent) => {
+        if (showPin && e.detail.latLng) {
+            setPinPosition(e.detail.latLng);
+        }
     };
 
-    // Circle follows pin when pin is dragged.
-    useEffect(() => {
-        if (circle !== null && pin !== null) {
-            pin.bindTo("position", circle, "center");
+    const updatePinPostion = (e: google.maps.MapMouseEvent) => {
+        if (showPin && e.latLng) {
+            setPinPosition(e.latLng.toJSON());
         }
-    }, [circle, pin]);
+    };
 
     // Pan map to fit all data points
     useEffect(() => {
@@ -97,42 +63,37 @@ const Map = ({
         map.fitBounds(bounds);
     }, [map, data, searchedCenter]);
 
-    return isLoaded ? (
-        <GoogleMap
-            mapContainerStyle={containerStyle}
-            center={defaultCenter}
-            zoom={3}
-            onLoad={onMapLoad}
-            onClick={updatePinPosition}
+    return (
+        <Map
+            reuseMaps={true}
+            defaultCenter={pinPosition}
+            defaultZoom={3}
+            mapId={MAP_ID!}
+            onClick={handleMapClick}
         >
             {pinPosition !== null ? (
                 <>
-                    <Marker
+                    <AdvancedMarker
                         position={pinPosition}
                         draggable={showPin}
-                        onMouseUp={updatePinPosition}
-                        onLoad={(p) => setPin(p)}
-                        opacity={showPin ? 1 : 0}
-                        clickable={showPin}
+                        onDrag={updatePinPostion}
+                        className={`${showPin ? "opacity-100" : "opacity-0"}`}
                     >
+                        <Pin />
                         <Circle
-                            center={pinPosition}
                             radius={searchRadius * 1000}
-                            options={{
-                                clickable: false,
-                                fillOpacity: 0.1,
-                                strokeWeight: 1,
-                                strokeOpacity: 0.5,
-                            }}
-                            onLoad={(c) => setCircle(c)}
+                            center={pinPosition}
+                            clickable={false}
+                            fillOpacity={0.1}
+                            strokeWeight={1}
+                            strokeOpacity={0.5}
                             visible={showPin}
                         />
-                    </Marker>
-                    {data !== null && map !== null
+                    </AdvancedMarker>
+                    {data !== null
                         ? data.features.map((entry) => {
                               return (
                                   <EventCircle
-                                      map={map}
                                       data={entry}
                                       key={entry.id}
                                       toggleSelectedRow={toggleSelectedRow}
@@ -180,10 +141,6 @@ const Map = ({
                     </div>
                 </>
             ) : null}
-        </GoogleMap>
-    ) : (
-        <></>
+        </Map>
     );
-};
-
-export default Map;
+}

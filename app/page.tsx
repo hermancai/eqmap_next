@@ -2,16 +2,24 @@
 
 import { useEffect, useState } from "react";
 import SearchForm from "@/components/home/SearchForm";
-import Map from "@/components/home/Map";
 import DataTable from "@/components/home/DataTable";
 import { EarthquakeData, USGSData } from "@/types/USGS";
 import GraphSection from "@/components/home/GraphSection";
 import { SelectedRows } from "@/types/data";
+import { APIProvider } from "@vis.gl/react-google-maps";
+import GoogleMap from "@/components/home/GoogleMap";
+
+const API_KEY = process.env.NEXT_PUBLIC_MAP_API_KEY;
+
+const defaultCenter = {
+    lat: 38.46,
+    lng: -144.56,
+} as google.maps.LatLngLiteral;
 
 export default function Home() {
     const [searchRadius, setSearchRadius] = useState<number>(3000);
     const [pinPosition, setPinPosition] =
-        useState<google.maps.LatLngLiteral | null>(null);
+        useState<google.maps.LatLngLiteral>(defaultCenter);
     // Need to separate from pinPosition to prevent panning on pin move
     const [searchedCenter, setSearchedCenter] =
         useState<google.maps.LatLngLiteral | null>(null);
@@ -49,15 +57,17 @@ export default function Home() {
                     setData={setData}
                 />
                 <div className="grow h-[75vh] md:h-auto">
-                    <Map
-                        pinPosition={pinPosition}
-                        setPinPosition={setPinPosition}
-                        searchedCenter={searchedCenter}
-                        searchRadius={searchRadius}
-                        data={data}
-                        selectedRows={selectedRows}
-                        toggleSelectedRow={toggleSelectedRow}
-                    />
+                    <APIProvider apiKey={API_KEY!}>
+                        <GoogleMap
+                            pinPosition={pinPosition}
+                            setPinPosition={setPinPosition}
+                            searchedCenter={searchedCenter}
+                            searchRadius={searchRadius}
+                            data={data}
+                            selectedRows={selectedRows}
+                            toggleSelectedRow={toggleSelectedRow}
+                        />
+                    </APIProvider>
                 </div>
             </div>
             {data !== null && data.features.length > 1 ? (
