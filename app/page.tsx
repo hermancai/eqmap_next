@@ -70,14 +70,16 @@ export default function Home() {
                     </APIProvider>
                 </div>
             </div>
-            {data !== null && data.features.length > 1 ? (
+            {data !== null && data.features.length > 0 ? (
                 <div className="bg-slate-100 py-10 w-full flex flex-col items-center gap-10">
                     <DataTable
                         entries={data.features}
                         selectedRows={selectedRows}
                         toggleSelectedRow={toggleSelectedRow}
                     />
-                    <GraphSection data={data.features} />
+                    {data.features.length > 1 && (
+                        <GraphSection data={data.features} />
+                    )}
                 </div>
             ) : null}
         </main>
