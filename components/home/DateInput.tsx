@@ -122,27 +122,39 @@ interface LineSpanProps {
 
 function StraightLineSpan({ checked }: LineSpanProps) {
     return (
-        <span
-            className={`relative h-full border-b-[2px] bottom-1/2 mx-4 transition-colors ${
-                checked ? "border-slate-300" : "border-slate-900"
-            }`}
-        />
+        <div className="w-full h-full relative">
+            <span
+                className={`absolute h-[2px] top-1/2 inset-x-4 transition-colors ${
+                    checked ? "bg-slate-300" : "bg-slate-900"
+                }`}
+            />
+        </div>
     );
 }
 
 function BentLineSpan({ checked }: LineSpanProps) {
     return (
         <>
-            <span
-                className={`relative h-1/2 w-1/2 border-b-[2px] border-l-[2px] left-1/2 transition-colors ${
-                    checked ? "border-slate-900" : "border-slate-300"
-                }`}
-            />
-            <span
-                className={`relative h-full border-b-[2px] bottom-1/2 mr-4 transition-colors ${
-                    checked ? "border-slate-900" : "border-slate-300"
-                }`}
-            />
+            <div className="w-full h-full relative">
+                <span
+                    className={`absolute h-1/2 w-[2px] top-0 left-1/2 transition-colors ${
+                        checked ? "bg-slate-900" : "bg-slate-300"
+                    }`}
+                />
+                <span
+                    className={`absolute h-[2px] w-1/2 top-1/2 left-1/2 transition-colors ${
+                        checked ? "bg-slate-900" : "bg-slate-300"
+                    }`}
+                />
+            </div>
+
+            <div className="w-full h-full relative">
+                <span
+                    className={`absolute h-[2px] top-1/2 left-0 right-4 transition-colors ${
+                        checked ? "bg-slate-900" : "bg-slate-300"
+                    }`}
+                />
+            </div>
         </>
     );
 }
